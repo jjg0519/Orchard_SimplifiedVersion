@@ -6,7 +6,7 @@ using System.Security;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("UserAPItweo")]
+[assembly: AssemblyTitle("PTG.Login")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("Orchard")]
@@ -20,7 +20,7 @@ using System.Security;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("d96aa224-016f-4c0f-a273-3e5c97e59673")]
+[assembly: Guid("cfc99f71-97ee-411a-acd8-0e5d4e5c1c2a")]
 
 // Version information for an assembly consists of the following four values:
 //
