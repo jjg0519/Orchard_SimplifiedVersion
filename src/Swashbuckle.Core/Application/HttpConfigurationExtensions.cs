@@ -98,7 +98,7 @@ namespace OrchardSwagger.Application
                 {
                         _httpConfig.Routes.MapHttpRoute(
                         name: "swagger_ui_shortcut",
-                        routeTemplate: "Orchard.Swagger/swagger",
+                        routeTemplate: "swagger",
                         defaults: null,
                         constraints: new { uriResolution = new HttpRouteDirectionConstraint(HttpRouteDirection.UriResolution) },
                         handler: new RedirectHandler(_rootUrlResolver, "swagger/ui/index"));

@@ -244,6 +244,7 @@
     <Content Include="Doc\json\petstore_simple.json" />
     <Content Include="Doc\json\uber.json" />
     <Content Include="Doc\lib\underscore-min.map" />
+    <None Include="Properties\PublishProfiles\123.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
