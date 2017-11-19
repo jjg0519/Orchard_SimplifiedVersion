@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{E9C9F120-07BA-4DFB-B9C3-3AFB9D44C9D5}"
 EndProject
@@ -141,9 +141,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gulp", "Gulp", "{90EBEE36-B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchard.Resources", "Orchard.Web\Modules\Orchard.Resources\Orchard.Resources.csproj", "{D4E8F7C8-2DB2-4C50-A422-DA1DF1E3CC73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchard.Swagger", "Orchard.Web\Modules\Orchard.Swagger\Orchard.Swagger.csproj", "{6A13C844-AE98-4832-931B-3D9FEA06BC78}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrchardSwagger.Core", "Swashbuckle.Core\OrchardSwagger.Core.csproj", "{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchard.Swagger", "Orchard.Web\Modules\Orchard.Swagger\Orchard.Swagger.csproj", "{6A13C844-AE98-4832-931B-3D9FEA06BC78}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -626,18 +626,6 @@ Global
 		{D4E8F7C8-2DB2-4C50-A422-DA1DF1E3CC73}.FxCop|Any CPU.ActiveCfg = Release|Any CPU
 		{D4E8F7C8-2DB2-4C50-A422-DA1DF1E3CC73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4E8F7C8-2DB2-4C50-A422-DA1DF1E3CC73}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.CodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.CodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.CodeCoverage|Any CPU.ActiveCfg = Release|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.CodeCoverage|Any CPU.Build.0 = Release|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Coverage|Any CPU.ActiveCfg = Release|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Coverage|Any CPU.Build.0 = Release|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.FxCop|Any CPU.ActiveCfg = Release|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.FxCop|Any CPU.Build.0 = Release|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.CodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
 		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.CodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
 		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.CodeCoverage|Any CPU.ActiveCfg = Release|Any CPU
@@ -650,6 +638,18 @@ Global
 		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.FxCop|Any CPU.Build.0 = Release|Any CPU
 		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.CodeAnalysis|Any CPU.ActiveCfg = Release|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.CodeAnalysis|Any CPU.Build.0 = Release|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.CodeCoverage|Any CPU.ActiveCfg = Release|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.CodeCoverage|Any CPU.Build.0 = Release|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Coverage|Any CPU.ActiveCfg = Release|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Coverage|Any CPU.Build.0 = Release|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.FxCop|Any CPU.ActiveCfg = Release|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.FxCop|Any CPU.Build.0 = Release|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A13C844-AE98-4832-931B-3D9FEA06BC78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

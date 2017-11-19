@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Orchard.Workflows</name>
+    </assembly>
+    <members>
+        <member name="T:Orchard.Workflows.Activities.SignalActivity">
+            <summary>
+            Represents a named event which can be triggered by any kind of activity.
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Helpers.OutcomeSerializerExtensions.FormatOutcomesJson(System.String)">
+            <summary>
+            Returns a JSON formatted string.
+            </summary>
+            <param name="outcomesText">A comma separated string containing outcomes.</param>
+        </member>
+        <member name="P:Orchard.Workflows.Models.WorkflowContext.Content">
+            <summary>
+            If set, represents the subject of the current workflow
+            </summary>
+        </member>
+        <member name="T:Orchard.Workflows.Models.ActivityRecord">
+            <summary>
+            Represents an activity in a <see cref="P:Orchard.Workflows.Models.ActivityRecord.WorkflowDefinitionRecord"/>
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.ActivityRecord.Name">
+            <summary>
+            The type of the activity.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.ActivityRecord.State">
+            <summary>
+            The serialized state of the activity.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.ActivityRecord.X">
+            <summary>
+            The left coordinate of the activity.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.ActivityRecord.Y">
+            <summary>
+            The top coordinate of the activity.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.ActivityRecord.Start">
+            <summary>
+            Whether the activity is a start state for a WorkflowDefinition.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.ActivityRecord.WorkflowDefinitionRecord">
+            <summary>
+            The parent <see cref="P:Orchard.Workflows.Models.ActivityRecord.WorkflowDefinitionRecord"/> 
+            containing this activity.
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Models.ActivityRecord.GetClientId">
+            <summary>
+            Gets the Id which can be used on the client. 
+            </summary>
+            <returns>An unique Id to represent this activity on the client.</returns>
+        </member>
+        <member name="T:Orchard.Workflows.Models.TransitionRecord">
+            <summary>
+            Reprensents a transition between two <see cref="T:Orchard.Workflows.Models.ActivityRecord"/>
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.TransitionRecord.SourceActivityRecord">
+            <summary>
+            The source <see cref="T:Orchard.Workflows.Models.ActivityRecord"/>
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.TransitionRecord.SourceEndpoint">
+            <summary>
+            The name of the endpoint on the source <see cref="T:Orchard.Workflows.Models.ActivityRecord"/>
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.TransitionRecord.DestinationActivityRecord">
+            <summary>
+            The destination <see cref="T:Orchard.Workflows.Models.ActivityRecord"/>
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.TransitionRecord.DestinationEndpoint">
+            <summary>
+            The name of the endpoint on the destination <see cref="T:Orchard.Workflows.Models.ActivityRecord"/>
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.TransitionRecord.WorkflowDefinitionRecord">
+            <summary>
+            The parent <see cref="P:Orchard.Workflows.Models.TransitionRecord.WorkflowDefinitionRecord"/>
+            </summary>
+        </member>
+        <member name="T:Orchard.Workflows.Models.WorkflowRecord">
+            <summary>
+            Reprensents a running workflow instance.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.WorkflowRecord.State">
+            <summary>
+            Serialized state of the workflow.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.WorkflowRecord.AwaitingActivities">
+            <summary>
+            List of activities the current workflow instance is waiting on 
+            for continuing its process.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.WorkflowRecord.ContentItemRecord">
+            <summary>
+            The associated content item
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.WorkflowRecord.WorkflowDefinitionRecord">
+            <summary>
+            Parent <see cref="P:Orchard.Workflows.Models.WorkflowRecord.WorkflowDefinitionRecord"/>
+            </summary>
+        </member>
+        <member name="T:Orchard.Workflows.Models.WorkflowDefinitionRecord">
+            <summary>
+            Represent a workflow definition comprised of activities and transitions between them.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.WorkflowDefinitionRecord.Enabled">
+            <summary>
+            Whether or not to enable workflows of this type.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.WorkflowDefinitionRecord.Name">
+            <summary>
+            The name of the workflow definition.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.WorkflowDefinitionRecord.ActivityRecords">
+            <summary>
+            List of <see cref="T:Orchard.Workflows.Models.ActivityRecord"/> composing this workflow definition.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.WorkflowDefinitionRecord.TransitionRecords">
+            <summary>
+            List of <see cref="T:Orchard.Workflows.Models.TransitionRecord"/> composing this workflow definition.
+            This is distinct from Activities as there could be activities without 
+            any connection an any time of the design process, though they should
+            be synchronized.
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.Models.WorkflowDefinitionRecord.WorkflowRecords">
+            <summary>
+            List of <see cref="T:Orchard.Workflows.Models.WorkflowRecord"/> associated with this workflow definition.
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Services.IActivity.GetPossibleOutcomes(Orchard.Workflows.Models.WorkflowContext,Orchard.Workflows.Models.ActivityContext)">
+            <summary>
+            List of possible outcomes when the activity is executed.
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Services.IActivity.CanExecute(Orchard.Workflows.Models.WorkflowContext,Orchard.Workflows.Models.ActivityContext)">
+            <summary>
+            Whether the activity can transition to the next outcome. Can prevent the activity from being transitioned
+            because a condition is not valid.
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Services.IActivity.Execute(Orchard.Workflows.Models.WorkflowContext,Orchard.Workflows.Models.ActivityContext)">
+            <summary>
+            Executes the current activity
+            </summary>
+            <returns>The names of the resulting outcomes.</returns>
+        </member>
+        <member name="M:Orchard.Workflows.Services.IActivity.OnWorkflowStarting(Orchard.Workflows.Models.WorkflowContext,Orchard.Workflows.Models.CancellationToken)">
+            <summary>
+            Called on each activity when a workflow is about to start
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Services.IActivity.OnWorkflowStarted(Orchard.Workflows.Models.WorkflowContext)">
+            <summary>
+            Called on each activity when a workflow has started
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Services.IActivity.OnWorkflowResuming(Orchard.Workflows.Models.WorkflowContext,Orchard.Workflows.Models.CancellationToken)">
+            <summary>
+            Called on each activity when a workflow is about to be resumed
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Services.IActivity.OnWorkflowResumed(Orchard.Workflows.Models.WorkflowContext)">
+            <summary>
+            Called on each activity when a workflow is resumed
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Services.IActivity.OnActivityExecuting(Orchard.Workflows.Models.WorkflowContext,Orchard.Workflows.Models.ActivityContext,Orchard.Workflows.Models.CancellationToken)">
+            <summary>
+            Called on each activity when an activity is about to be executed
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Services.IActivity.OnActivityExecuted(Orchard.Workflows.Models.WorkflowContext,Orchard.Workflows.Models.ActivityContext)">
+            <summary>
+            Called on each activity when an activity has been executed
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Services.IWorkflowManager.TriggerEvent(System.String,Orchard.ContentManagement.IContent,System.Func{System.Collections.Generic.Dictionary{System.String,System.Object}})">
+            <summary>
+            Triggers a specific Event, and provides the tokens context if the event is 
+            actually executed
+            </summary>
+            <param name="name">The type of the event to trigger, e.g. Publish</param>
+            <param name="target">The <see cref="T:Orchard.ContentManagement.IContent"/> content item the event is related to</param>
+            <param name="tokensContext">An object containing the tokens context</param>
+        </member>
+        <member name="M:Orchard.Workflows.Services.WorkflowManager.InvokeActivities(System.Action{Orchard.Workflows.Services.IActivity})">
+            <summary>
+            Executes a specific action on all the activities of a workflow, using a specific context
+            </summary>
+        </member>
+        <member name="M:Orchard.Workflows.Tokens.StateTokens.ParseState(System.String,Orchard.Workflows.Models.WorkflowContext)">
+            <summary>
+            Resolves the specified expression into an object stored in WorkflowContext.
+            </summary>
+            <param name="expression">The expression resolving to the state stored in WorkflowContext. E.g. "MyData.MyProperty.MySubProperty"</param>
+        </member>
+        <member name="P:Orchard.Workflows.ViewModels.ActivityViewModel.ClientId">
+            <summary>
+            The local id used for connections
+            </summary>
+        </member>
+        <member name="P:Orchard.Workflows.ViewModels.ActivityViewModel.Name">
+            <summary>
+            The name of the activity
+            </summary>
+        </member>
+    </members>
+</doc>
