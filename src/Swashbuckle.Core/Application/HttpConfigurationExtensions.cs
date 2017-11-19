@@ -93,12 +93,18 @@ namespace OrchardSwagger.Application
 
             if (routeTemplate == DefaultRouteTemplate)
             {
-                _httpConfig.Routes.MapHttpRoute(
-                    name: "swagger_ui_shortcut",
-                    routeTemplate: "Orchard.Swagger/swagger",
-                    defaults: null,
-                    constraints: new { uriResolution = new HttpRouteDirectionConstraint(HttpRouteDirection.UriResolution) },
-                    handler: new RedirectHandler(_rootUrlResolver, "swagger/ui/index"));
+                var t = _httpConfig.Routes.ContainsKey("swagger_ui_shortcut");
+                if (!t)
+                {
+                        _httpConfig.Routes.MapHttpRoute(
+                        name: "swagger_ui_shortcut",
+                        routeTemplate: "Orchard.Swagger/swagger",
+                        defaults: null,
+                        constraints: new { uriResolution = new HttpRouteDirectionConstraint(HttpRouteDirection.UriResolution) },
+                        handler: new RedirectHandler(_rootUrlResolver, "swagger/ui/index"));
+                        
+                }
+                
             }
         }
     }

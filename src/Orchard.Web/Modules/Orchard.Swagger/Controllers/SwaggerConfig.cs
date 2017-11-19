@@ -11,6 +11,8 @@ using System.IO;
 using System.Xml;
 using Orchard.Mvc.Routes;
 using Orchard.WebApi.Routes;
+using System.Web;
+using System.Web.Routing;
 //using Swashbuckle.Application;
 
 namespace Orchard.Swagger
@@ -22,7 +24,7 @@ namespace Orchard.Swagger
             var api = GlobalConfiguration.Configuration.Services.GetApiExplorer();
             if (!api.ApiDescriptions.Any())
             {
-                GlobalConfiguration.Configuration
+                    GlobalConfiguration.Configuration
                    .EnableSwagger(c =>
                    {
                        // By default, the service root url is inferred from the request used to access the docs.
@@ -309,7 +311,7 @@ namespace Orchard.Swagger
                             if (controllerName.EndsWith("Controller"))
                             {
                                 //模块信息
-                                var moduleName = arrPath[length-3]+ arrPath[length - 2];
+                                var moduleName = arrPath[length - 3] + arrPath[length - 2];
                                 moduleList.Add(moduleName);
 
                                 //获取控制器注释
