@@ -11,7 +11,6 @@ using Orchard.Mvc.Routes;
 using Orchard.WebApi.Routes;
 //using OrchardSwagger.Application;
 using System.Web.Mvc;
-using Orchard.Swagger.Controlles;
 using System.Web.Http.Dispatcher;
 using Orchard.WebApi;
 
@@ -53,10 +52,6 @@ namespace Orchard.Swagger {
                     }
                     else
                     {
-                       // var area = httpRouteDescriptor.RouteTemplate.Substring(4,
-                       //        httpRouteDescriptor.RouteTemplate.Length - 18 - 4);
-                       //httpRouteDescriptor.RouteTemplate= httpRouteDescriptor.RouteTemplate.Replace("{controller}","{action}").Replace(area, "{cotroller}");
-                       // httpRouteDescriptor.Defaults = new { controller = area, action = "api", id = UrlParameter.Optional};
                         config.Routes.MapHttpRoute(httpRouteDescriptor.Name,
                             httpRouteDescriptor.RouteTemplate,
                             httpRouteDescriptor.Defaults, httpRouteDescriptor.Constraints);

@@ -1,10 +1,10 @@
 using System.Web.Http;
-using OrchardSwagger.Application;
+//using OrchardSwagger.Application;
 using System.Linq;
 using Autofac;
 using System;
 using System.Web.Http.Description;
-using OrchardSwagger.Swagger;
+//using OrchardSwagger.Swagger;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +13,8 @@ using Orchard.Mvc.Routes;
 using Orchard.WebApi.Routes;
 using System.Web;
 using System.Web.Routing;
-//using Swashbuckle.Application;
+using Swashbuckle.Application;
+using Swashbuckle.Swagger;
 
 namespace Orchard.Swagger
 {
@@ -24,6 +25,10 @@ namespace Orchard.Swagger
             var api = GlobalConfiguration.Configuration.Services.GetApiExplorer();
             if (!api.ApiDescriptions.Any())
             {
+                var t =GlobalConfiguration.Configuration.Routes.ContainsKey("swagger_ui_shortcut");
+                if (!t)
+                {
+
                     GlobalConfiguration.Configuration
                    .EnableSwagger(c =>
                    {
@@ -192,7 +197,7 @@ namespace Orchard.Swagger
                        // Wrap the default SwaggerGenerator with additional behavior (e.g. caching) or provide an
                        // alternative implementation for ISwaggerProvider with the CustomProvider option.
                        //
-                       c.CustomProvider((defaultProvider) => new Orchard.Swagger.SwaggerConfig.CachingSwaggerProvider(defaultProvider));
+                       //c.CustomProvider((defaultProvider) => new Orchard.Swagger.SwaggerConfig.CachingSwaggerProvider(defaultProvider));
                    })
                 .EnableSwaggerUi(c =>
                 {
@@ -248,6 +253,8 @@ namespace Orchard.Swagger
                     //
                     //c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
                 });
+
+                }
             }
         }
         public class CachingSwaggerProvider : ISwaggerProvider

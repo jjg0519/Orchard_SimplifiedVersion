@@ -22,7 +22,7 @@ namespace PTG.Login.Controllers
         }
 
         // POST: api/Home
-        public HttpResponseMessage Post([FromBody]ModelsDTO.LoginUserInfo loginUser)
+        public HttpResponseMessage Post(ModelsDTO.LoginUserInfo loginUser)
         {
             return toJson( new string[] { loginUser.password, loginUser.username });
         }

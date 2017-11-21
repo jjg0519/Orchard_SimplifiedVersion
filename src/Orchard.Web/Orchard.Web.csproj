@@ -12,7 +12,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Orchard.Web</RootNamespace>
     <AssemblyName>Orchard.Web</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort>44300</IISExpressSSLPort>
@@ -165,41 +165,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Doc\css\print.css" />
-    <Content Include="Doc\css\reset.css" />
-    <Content Include="Doc\css\screen.css" />
-    <Content Include="Doc\css\style.css" />
-    <Content Include="Doc\css\typography.css" />
-    <Content Include="Doc\fonts\droid-sans-v6-latin-700.svg" />
-    <Content Include="Doc\fonts\droid-sans-v6-latin-regular.svg" />
-    <Content Include="Doc\images\explorer_icons.png" />
-    <Content Include="Doc\images\favicon-16x16.png" />
-    <Content Include="Doc\images\favicon-32x32.png" />
-    <Content Include="Doc\images\favicon.ico" />
-    <Content Include="Doc\images\logo_small.png" />
-    <Content Include="Doc\images\pet_store_api.png" />
-    <Content Include="Doc\images\throbber.gif" />
-    <Content Include="Doc\images\wordnik_api.png" />
-    <Content Include="Doc\index.html" />
-    <Content Include="Doc\lang\en.js" />
-    <Content Include="Doc\lang\es.js" />
-    <Content Include="Doc\lang\pt.js" />
-    <Content Include="Doc\lang\ru.js" />
-    <Content Include="Doc\lang\translator.js" />
-    <Content Include="Doc\lib\backbone-min.js" />
-    <Content Include="Doc\lib\handlebars-2.0.0.js" />
-    <Content Include="Doc\lib\highlight.7.3.pack.js" />
-    <Content Include="Doc\lib\jquery-1.8.0.min.js" />
-    <Content Include="Doc\lib\jquery.ba-bbq.min.js" />
-    <Content Include="Doc\lib\jquery.slideto.min.js" />
-    <Content Include="Doc\lib\jquery.wiggle.min.js" />
-    <Content Include="Doc\lib\marked.js" />
-    <Content Include="Doc\lib\swagger-custom.js" />
-    <Content Include="Doc\lib\swagger-oauth.js" />
-    <Content Include="Doc\lib\underscore-min.js" />
-    <Content Include="Doc\swagger-ui-ext.js" />
-    <Content Include="Doc\swagger-ui.js" />
-    <Content Include="Doc\swagger-ui.min.js" />
     <Content Include="Global.asax" />
     <Content Include="Refresh.html" />
     <Content Include="Web.config">
@@ -230,20 +195,6 @@
   <ItemGroup>
     <Content Include="Config\Sites.config" />
     <Content Include="packages.config" />
-    <Content Include="Doc\fonts\droid-sans-v6-latin-700.eot" />
-    <Content Include="Doc\fonts\droid-sans-v6-latin-700.ttf" />
-    <Content Include="Doc\fonts\droid-sans-v6-latin-700.woff" />
-    <Content Include="Doc\fonts\droid-sans-v6-latin-700.woff2" />
-    <Content Include="Doc\fonts\droid-sans-v6-latin-regular.eot" />
-    <Content Include="Doc\fonts\droid-sans-v6-latin-regular.ttf" />
-    <Content Include="Doc\fonts\droid-sans-v6-latin-regular.woff" />
-    <Content Include="Doc\fonts\droid-sans-v6-latin-regular.woff2" />
-    <Content Include="Doc\json\dev.json" />
-    <Content Include="Doc\json\petstore.json" />
-    <Content Include="Doc\json\petstore_full.json" />
-    <Content Include="Doc\json\petstore_simple.json" />
-    <Content Include="Doc\json\uber.json" />
-    <Content Include="Doc\lib\underscore-min.map" />
     <None Include="Properties\PublishProfiles\123.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

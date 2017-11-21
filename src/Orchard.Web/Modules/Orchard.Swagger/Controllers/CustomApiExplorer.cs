@@ -1,4 +1,5 @@
 ﻿using Orchard.Swagger;
+using Orchard.Swagger.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +18,7 @@ using System.Web.Http.ModelBinding;
 using System.Web.Http.Routing;
 using System.Web.Http.ValueProviders;
 
-namespace Orchard.Swagger.Controlles
+namespace Orchard.Swagger
 {
 
     /// <summary> Explores the URI space of the service based on routes, controllers and actions available in the system. </summary>
@@ -30,24 +31,16 @@ namespace Orchard.Swagger.Controlles
         private static readonly Regex _actionVariableRegex = new Regex(String.Format(CultureInfo.CurrentCulture, "{{{0}}}", ActionVariableName), RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         private static readonly Regex _controllerVariableRegex = new Regex(String.Format(CultureInfo.CurrentCulture, "{{{0}}}", ControllerVariableName), RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         /// <summary>
-        /// Gets or sets the documentation provider. The provider will be responsible for documenting the API.
+        /// 初始化 System.Web.Http.Description.ApiExplorer 类的新实例。
         /// </summary>
-        /// <value>
-        /// The documentation provider.
-        /// </value>
-        public IDocumentationProvider DocumentationProvider { get; set; }
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ApiExplorer"/> class.
-        /// </summary>
-        /// <param name="configuration">The configuration.</param>
+        /// <param name="configuration">配置</param>
         public CustomApiExplorer(HttpConfiguration configuration)
         {
             _config = configuration;
             _apiDescriptions = new Lazy<Collection<ApiDescription>>(InitializeApiDescriptions);
         }
-
         /// <summary>
-        /// Gets the API descriptions. The descriptions are initialized on the first access.
+        /// 获取 API 说明。这些说明将在首次访问时进行初始化
         /// </summary>
         public Collection<ApiDescription> ApiDescriptions
         {
@@ -56,13 +49,101 @@ namespace Orchard.Swagger.Controlles
                 return _apiDescriptions.Value;
             }
         }
+        /// <summary>
+        ///  获取或设置文档提供程序。该提供程序将负责记录 API。
+        /// </summary>
+        /// <value>
+        /// 文档提供程序
+        /// </value>
+        public IDocumentationProvider DocumentationProvider { get; set; }
+        /// <summary>
+        /// 获取该操作支持的 HttpMethods 的集合。初始化 System.Web.Http.Description.ApiExplorer.ApiDescriptions时调用。
+        /// </summary>
+        /// <param name="route">路由.</param>
+        /// <param name="actionDescriptor">操作描述符</param>
+        /// <returns>该操作支持的 HttpMethods 的集合.</returns>
+        public virtual Collection<HttpMethod> GetHttpMethodsSupportedByAction(IHttpRoute route, HttpActionDescriptor actionDescriptor)
+        {
+            if (route == null)
+            {
+                throw new ArgumentNullException("route");
+            }
+
+            if (actionDescriptor == null)
+            {
+                throw new ArgumentNullException("actionDescriptor");
+            }
+
+            IList<HttpMethod> supportedMethods = new List<HttpMethod>();
+            IList<HttpMethod> actionHttpMethods = actionDescriptor.SupportedHttpMethods;
+            HttpMethodConstraint httpMethodConstraint = route.Constraints.Values.FirstOrDefault(c => typeof(HttpMethodConstraint).IsAssignableFrom(c.GetType())) as HttpMethodConstraint;
+
+            if (httpMethodConstraint == null)
+            {
+                supportedMethods = actionHttpMethods;
+            }
+            else
+            {
+                supportedMethods = httpMethodConstraint.AllowedMethods.Intersect(actionHttpMethods).ToList();
+            }
+
+            return new Collection<HttpMethod>(supportedMethods);
+        }
+
+        /// <summary>
+        /// 确定是否应考虑将此操作用于生成 System.Web.Http.Description.ApiExplorer.ApiDescriptions。初始化 System.Web.Http.Description.ApiExplorer.ApiDescriptions时调用。
+        /// </summary>
+        /// <param name="actionVariableValue">来自路由的操作变量值</param>
+        /// <param name="actionDescriptor">操作描述符.</param>
+        /// <param name="route">路由</param>
+        /// <returns>如果应考虑将此操作用于生成 System.Web.Http.Description.ApiExplorer.ApiDescriptions，则为 true，否则为 false。</returns>
+        public virtual bool ShouldExploreAction(string actionVariableValue, HttpActionDescriptor actionDescriptor, IHttpRoute route)
+        {
+            if (actionDescriptor == null)
+            {
+                throw new ArgumentNullException("actionDescriptor");
+            }
+
+            if (route == null)
+            {
+                throw new ArgumentNullException("route");
+            }
+
+            ApiExplorerSettingsAttribute setting = actionDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
+            NonActionAttribute nonAction = actionDescriptor.GetCustomAttributes<NonActionAttribute>().FirstOrDefault();
+            return (setting == null || !setting.IgnoreApi) &&
+                (nonAction == null) &&
+                MatchRegexConstraint(route, ActionVariableName, actionVariableValue);
+        }
+        /// <summary>
+        /// 确定是否应考虑将此控制器用于生成 System.Web.Http.Description.ApiExplorer.ApiDescriptions。初始化System.Web.Http.Description.ApiExplorer.ApiDescriptions 时调用。
+        /// </summary>
+        /// <param name="controllerVariableValue">来自路由的控制器变量值</param>
+        /// <param name="controllerDescriptor">控制器描述符</param>
+        /// <param name="route">路由</param>
+        /// <returns>如果应考虑将此控制器用于生成 System.Web.Http.Description.ApiExplorer.ApiDescriptions，则为 true，否则为false</returns>
+        public virtual bool ShouldExploreController(string controllerVariableValue, HttpControllerDescriptor controllerDescriptor, IHttpRoute route)
+        {
+            if (controllerDescriptor == null)
+            {
+                throw new ArgumentNullException("controllerDescriptor");
+            }
+
+            if (route == null)
+            {
+                throw new ArgumentNullException("route");
+            }
+
+            ApiExplorerSettingsAttribute setting = controllerDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
+            return (setting == null || !setting.IgnoreApi) &&
+                MatchRegexConstraint(route, ControllerVariableName, controllerVariableValue);
+        }
 
         private Collection<ApiDescription> InitializeApiDescriptions()
         {
             Collection<ApiDescription> apiDescriptions = new Collection<ApiDescription>();
             IHttpControllerSelector controllerSelector = _config.Services.GetHttpControllerSelector();
             IDictionary<string, HttpControllerDescriptor> controllerMappings = controllerSelector.GetControllerMapping();
-            //_controllerInfoCache.Value.ToDictionary(c => c.Key, c => c.Value, StringComparer.OrdinalIgnoreCase);
             //api控制器
             if (controllerMappings != null)
             {
@@ -127,22 +208,6 @@ namespace Orchard.Swagger.Controlles
         /// <param name="controllerDescriptor">The controller descriptor.</param>
         /// <param name="route">The route.</param>
         /// <returns><c>true</c> if the controller should be considered for <see cref="ApiExplorer.ApiDescriptions"/> generation, <c>false</c> otherwise.</returns>
-        public virtual bool ShouldExploreController(string controllerVariableValue, HttpControllerDescriptor controllerDescriptor, IHttpRoute route)
-        {
-            if (controllerDescriptor == null)
-            {
-                throw new ArgumentNullException("controllerDescriptor");
-            }
-
-            if (route == null)
-            {
-                throw new ArgumentNullException("route");
-            }
-
-            ApiExplorerSettingsAttribute setting = controllerDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
-            return (setting == null || !setting.IgnoreApi) &&
-                MatchRegexConstraint(route, ControllerVariableName, controllerVariableValue);
-        }
         private static bool MatchRegexConstraint(IHttpRoute route, string parameterName, string parameterValue)
         {
             IDictionary<string, object> constraints = route.Constraints;
@@ -253,39 +318,6 @@ namespace Orchard.Swagger.Controlles
                 });
             }
         }       
-        /// <summary>
-                 /// Gets a collection of HttpMethods supported by the action. Called when initializing the <see cref="ApiExplorer.ApiDescriptions"/>.
-                 /// </summary>
-                 /// <param name="route">The route.</param>
-                 /// <param name="actionDescriptor">The action descriptor.</param>
-                 /// <returns>A collection of HttpMethods supported by the action.</returns>
-        public virtual Collection<HttpMethod> GetHttpMethodsSupportedByAction(IHttpRoute route, HttpActionDescriptor actionDescriptor)
-        {
-            if (route == null)
-            {
-                throw new ArgumentNullException("route");
-            }
-
-            if (actionDescriptor == null)
-            {
-                throw new ArgumentNullException("actionDescriptor");
-            }
-
-            IList<HttpMethod> supportedMethods = new List<HttpMethod>();
-            IList<HttpMethod> actionHttpMethods = actionDescriptor.SupportedHttpMethods;
-            HttpMethodConstraint httpMethodConstraint = route.Constraints.Values.FirstOrDefault(c => typeof(HttpMethodConstraint).IsAssignableFrom(c.GetType())) as HttpMethodConstraint;
-
-            if (httpMethodConstraint == null)
-            {
-                supportedMethods = actionHttpMethods;
-            }
-            else
-            {
-                supportedMethods = httpMethodConstraint.AllowedMethods.Intersect(actionHttpMethods).ToList();
-            }
-
-            return new Collection<HttpMethod>(supportedMethods);
-        }
 
         private static bool TryExpandUriParameters(IHttpRoute route, string routeTemplate, ICollection<ApiParameterDescription> parameterDescriptions, out string expandedRouteTemplate)
         {
@@ -441,31 +473,6 @@ namespace Orchard.Swagger.Controlles
             }
 
             return documentationProvider.GetDocumentation(actionDescriptor);
-        }
-        /// <summary>
-        /// Determines whether the action should be considered for <see cref="ApiExplorer.ApiDescriptions"/> generation. Called when initializing the <see cref="ApiExplorer.ApiDescriptions"/>.
-        /// </summary>
-        /// <param name="actionVariableValue">The action variable value from the route.</param>
-        /// <param name="actionDescriptor">The action descriptor.</param>
-        /// <param name="route">The route.</param>
-        /// <returns><c>true</c> if the action should be considered for <see cref="ApiExplorer.ApiDescriptions"/> generation, <c>false</c> otherwise.</returns>
-        public virtual bool ShouldExploreAction(string actionVariableValue, HttpActionDescriptor actionDescriptor, IHttpRoute route)
-        {
-            if (actionDescriptor == null)
-            {
-                throw new ArgumentNullException("actionDescriptor");
-            }
-
-            if (route == null)
-            {
-                throw new ArgumentNullException("route");
-            }
-
-            ApiExplorerSettingsAttribute setting = actionDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
-            NonActionAttribute nonAction = actionDescriptor.GetCustomAttributes<NonActionAttribute>().FirstOrDefault();
-            return (setting == null || !setting.IgnoreApi) &&
-                (nonAction == null) &&
-                MatchRegexConstraint(route, ActionVariableName, actionVariableValue);
         }
         // remove ApiDescription that will lead to ambiguous action matching.
         private static Collection<ApiDescription> RemoveInvalidApiDescriptions(Collection<ApiDescription> apiDescriptions)
