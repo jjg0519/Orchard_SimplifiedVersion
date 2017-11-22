@@ -707,7 +707,7 @@ Global
 		{B3B5538F-3AA4-4BD0-B708-EF38E452558E} = {E9C9F120-07BA-4DFB-B9C3-3AFB9D44C9D5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {51DBEEC9-6B6C-4A5C-904A-32FB167566E4}
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\TransientFaultHandling.Core.5.1.1209.1\lib\NET4
+		SolutionGuid = {51DBEEC9-6B6C-4A5C-904A-32FB167566E4}
 	EndGlobalSection
 EndGlobal

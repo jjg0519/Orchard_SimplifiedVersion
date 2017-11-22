@@ -121,7 +121,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\CustomApiDescription.cs" />
     <Compile Include="Controllers\CustomApiExplorer.cs" />
     <Compile Include="Controllers\OrchardShellEvents.cs" />
     <Compile Include="Controllers\SwaggerApiDescription.cs" />
@@ -159,7 +158,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Start\" />
     <Folder Include="Models\" />
     <Folder Include="Views\" />
   </ItemGroup>

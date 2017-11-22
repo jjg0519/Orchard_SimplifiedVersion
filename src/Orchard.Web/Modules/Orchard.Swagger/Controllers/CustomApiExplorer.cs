@@ -1,6 +1,4 @@
-﻿using Orchard.Swagger;
-using Orchard.Swagger.Controllers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -22,74 +20,11 @@ namespace Orchard.Swagger
 {
 
     /// <summary> Explores the URI space of the service based on routes, controllers and actions available in the system. </summary>
-    public class CustomApiExplorer:IApiExplorer
+    public class CustomApiExplorer:ApiExplorer
     {
-        private Lazy<Collection<ApiDescription>> _apiDescriptions;
-        private readonly HttpConfiguration _config;
-        private const string ActionVariableName = "action";
-        private const string ControllerVariableName = "controller";
-        private static readonly Regex _actionVariableRegex = new Regex(String.Format(CultureInfo.CurrentCulture, "{{{0}}}", ActionVariableName), RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-        private static readonly Regex _controllerVariableRegex = new Regex(String.Format(CultureInfo.CurrentCulture, "{{{0}}}", ControllerVariableName), RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-        /// <summary>
-        /// 初始化 System.Web.Http.Description.ApiExplorer 类的新实例。
-        /// </summary>
-        /// <param name="configuration">配置</param>
-        public CustomApiExplorer(HttpConfiguration configuration)
+        public CustomApiExplorer(HttpConfiguration configuration) : base(configuration)
         {
-            _config = configuration;
-            _apiDescriptions = new Lazy<Collection<ApiDescription>>(InitializeApiDescriptions);
         }
-        /// <summary>
-        /// 获取 API 说明。这些说明将在首次访问时进行初始化
-        /// </summary>
-        public Collection<ApiDescription> ApiDescriptions
-        {
-            get
-            {
-                return _apiDescriptions.Value;
-            }
-        }
-        /// <summary>
-        ///  获取或设置文档提供程序。该提供程序将负责记录 API。
-        /// </summary>
-        /// <value>
-        /// 文档提供程序
-        /// </value>
-        public IDocumentationProvider DocumentationProvider { get; set; }
-        /// <summary>
-        /// 获取该操作支持的 HttpMethods 的集合。初始化 System.Web.Http.Description.ApiExplorer.ApiDescriptions时调用。
-        /// </summary>
-        /// <param name="route">路由.</param>
-        /// <param name="actionDescriptor">操作描述符</param>
-        /// <returns>该操作支持的 HttpMethods 的集合.</returns>
-        public virtual Collection<HttpMethod> GetHttpMethodsSupportedByAction(IHttpRoute route, HttpActionDescriptor actionDescriptor)
-        {
-            if (route == null)
-            {
-                throw new ArgumentNullException("route");
-            }
-
-            if (actionDescriptor == null)
-            {
-                throw new ArgumentNullException("actionDescriptor");
-            }
-
-            IList<HttpMethod> supportedMethods = new List<HttpMethod>();
-            IList<HttpMethod> actionHttpMethods = actionDescriptor.SupportedHttpMethods;
-            HttpMethodConstraint httpMethodConstraint = route.Constraints.Values.FirstOrDefault(c => typeof(HttpMethodConstraint).IsAssignableFrom(c.GetType())) as HttpMethodConstraint;
-
-            if (httpMethodConstraint == null)
-            {
-                supportedMethods = actionHttpMethods;
-            }
-            else
-            {
-                supportedMethods = httpMethodConstraint.AllowedMethods.Intersect(actionHttpMethods).ToList();
-            }
-
-            return new Collection<HttpMethod>(supportedMethods);
-        }
-
         /// <summary>
         /// 确定是否应考虑将此操作用于生成 System.Web.Http.Description.ApiExplorer.ApiDescriptions。初始化 System.Web.Http.Description.ApiExplorer.ApiDescriptions时调用。
         /// </summary>
@@ -97,7 +32,7 @@ namespace Orchard.Swagger
         /// <param name="actionDescriptor">操作描述符.</param>
         /// <param name="route">路由</param>
         /// <returns>如果应考虑将此操作用于生成 System.Web.Http.Description.ApiExplorer.ApiDescriptions，则为 true，否则为 false。</returns>
-        public virtual bool ShouldExploreAction(string actionVariableValue, HttpActionDescriptor actionDescriptor, IHttpRoute route)
+        public override bool ShouldExploreAction(string actionVariableValue, HttpActionDescriptor actionDescriptor, IHttpRoute route)
         {
             if (actionDescriptor == null)
             {
@@ -111,18 +46,22 @@ namespace Orchard.Swagger
 
             ApiExplorerSettingsAttribute setting = actionDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
             NonActionAttribute nonAction = actionDescriptor.GetCustomAttributes<NonActionAttribute>().FirstOrDefault();
-            return (setting == null || !setting.IgnoreApi) &&
-                (nonAction == null) &&
-                MatchRegexConstraint(route, ActionVariableName, actionVariableValue);
+            string hcNamespace = string.Empty;
+            string routetemplate = string.Empty;
+            routetemplate = route.RouteTemplate.Split('/')[1];
+            hcNamespace = actionDescriptor.ControllerDescriptor.ControllerType.Namespace;
+            if (hcNamespace.Contains(routetemplate))
+            {
+                return (setting == null || !setting.IgnoreApi) &&
+                  (nonAction == null) &&
+                  MatchRegexConstraint(route, "action", actionVariableValue);
+            }
+            else
+            {
+                return false;
+            }
         }
-        /// <summary>
-        /// 确定是否应考虑将此控制器用于生成 System.Web.Http.Description.ApiExplorer.ApiDescriptions。初始化System.Web.Http.Description.ApiExplorer.ApiDescriptions 时调用。
-        /// </summary>
-        /// <param name="controllerVariableValue">来自路由的控制器变量值</param>
-        /// <param name="controllerDescriptor">控制器描述符</param>
-        /// <param name="route">路由</param>
-        /// <returns>如果应考虑将此控制器用于生成 System.Web.Http.Description.ApiExplorer.ApiDescriptions，则为 true，否则为false</returns>
-        public virtual bool ShouldExploreController(string controllerVariableValue, HttpControllerDescriptor controllerDescriptor, IHttpRoute route)
+        public override bool ShouldExploreController(string controllerVariableValue, HttpControllerDescriptor controllerDescriptor, IHttpRoute route)
         {
             if (controllerDescriptor == null)
             {
@@ -135,79 +74,21 @@ namespace Orchard.Swagger
             }
 
             ApiExplorerSettingsAttribute setting = controllerDescriptor.GetCustomAttributes<ApiExplorerSettingsAttribute>().FirstOrDefault();
-            return (setting == null || !setting.IgnoreApi) &&
-                MatchRegexConstraint(route, ControllerVariableName, controllerVariableValue);
-        }
-
-        private Collection<ApiDescription> InitializeApiDescriptions()
-        {
-            Collection<ApiDescription> apiDescriptions = new Collection<ApiDescription>();
-            IHttpControllerSelector controllerSelector = _config.Services.GetHttpControllerSelector();
-            IDictionary<string, HttpControllerDescriptor> controllerMappings = controllerSelector.GetControllerMapping();
-            //api控制器
-            if (controllerMappings != null)
+            string hcNamespace = string.Empty;
+            string routetemplate = string.Empty;
+            routetemplate = route.RouteTemplate.Split('/')[1];
+            hcNamespace = controllerDescriptor.ControllerType.Namespace;
+            if (hcNamespace.Contains(routetemplate))
             {
-                string hcNamespace = string.Empty;
-                string routetemplate = string.Empty;
-                //路由模板
-                foreach (var route in _config.Routes)
-                {
-                    routetemplate = route.RouteTemplate.Split('/')[1];
-                    foreach(var hcdescriptorList in controllerMappings.ToList())
-                    {
-                        hcNamespace = hcdescriptorList.Value.ControllerType.Namespace;
-                        if (hcNamespace.Contains(routetemplate))
-                        {
-                            ExploreRouteControllers(hcdescriptorList, route, apiDescriptions);
-                        }
-                    }
-                }
-                // remove ApiDescription that will lead to ambiguous action matching. E.g. a controller with Post() and PostComment(). When the route template is {controller}, it produces POST /controller and POST /controller.
-                //apiDescriptions = RemoveInvalidApiDescriptions(apiDescriptions);
-            }
-            return apiDescriptions;
-        }
-        private void ExploreRouteControllers(KeyValuePair<string, HttpControllerDescriptor> controllerMappings, IHttpRoute route, Collection<ApiDescription> apiDescriptions)
-        {
-            string routeTemplate = route.RouteTemplate;
-            object controllerVariableValue;
-            if (_controllerVariableRegex.IsMatch(routeTemplate))
-            {
-                // unbound controller variable, {controller}
-                //foreach (KeyValuePair<string, HttpControllerDescriptor> controllerMapping in controllerMappings)
-                //{
-                    controllerVariableValue = controllerMappings.Key;
-                    HttpControllerDescriptor controllerDescriptor = controllerMappings.Value;
-                    if (ShouldExploreController(controllerVariableValue.ToString(), controllerDescriptor, route))
-                    {
-                        // expand {controller} variable
-                        string expandedRouteTemplate = _controllerVariableRegex.Replace(routeTemplate, controllerVariableValue.ToString());
-                        ExploreRouteActions(route, expandedRouteTemplate, controllerDescriptor, apiDescriptions);
-                    }
-                //}
+                return (setting == null || !setting.IgnoreApi) &&
+MatchRegexConstraint(route, "controller", controllerVariableValue);
             }
             else
             {
-                //bound controller variable, { controller = "controllerName"}
-                if (route.Defaults.TryGetValue(ControllerVariableName, out controllerVariableValue))
-                {
-                    HttpControllerDescriptor controllerDescriptor;
-                    bool tf = object.Equals(controllerMappings, controllerVariableValue) ? true : false;
-                    controllerDescriptor= object.Equals(controllerMappings, controllerVariableValue) ? controllerMappings.Value : null;
-                    if (tf && ShouldExploreController(controllerVariableValue.ToString(), controllerDescriptor, route))
-                    {
-                        ExploreRouteActions(route, routeTemplate, controllerDescriptor, apiDescriptions);
-                    }
-                }
+                return false;
             }
+
         }
-        /// <summary>
-        /// Determines whether the controller should be considered for <see cref="ApiExplorer.ApiDescriptions"/> generation. Called when initializing the <see cref="ApiExplorer.ApiDescriptions"/>.
-        /// </summary>
-        /// <param name="controllerVariableValue">The controller variable value from the route.</param>
-        /// <param name="controllerDescriptor">The controller descriptor.</param>
-        /// <param name="route">The route.</param>
-        /// <returns><c>true</c> if the controller should be considered for <see cref="ApiExplorer.ApiDescriptions"/> generation, <c>false</c> otherwise.</returns>
         private static bool MatchRegexConstraint(IHttpRoute route, string parameterName, string parameterValue)
         {
             IDictionary<string, object> constraints = route.Constraints;
@@ -228,282 +109,6 @@ namespace Orchard.Swagger
             }
             return true;
         }
-        private void ExploreRouteActions(IHttpRoute route, string localPath, HttpControllerDescriptor controllerDescriptor, Collection<ApiDescription> apiDescriptions)
-        {
-            ServicesContainer controllerServices = controllerDescriptor.Configuration.Services;
-            ILookup<string, HttpActionDescriptor> actionMappings = controllerServices.GetActionSelector().GetActionMapping(controllerDescriptor);
-            object actionVariableValue;
-            if (actionMappings != null)
-            {
-                if (_actionVariableRegex.IsMatch(localPath))
-                {
-                    // unbound action variable, {action}
-                    foreach (IGrouping<string, HttpActionDescriptor> actionMapping in actionMappings)
-                    {
-                        // expand {action} variable
-                        actionVariableValue = actionMapping.Key;
-                        string expandedLocalPath = _actionVariableRegex.Replace(localPath, actionVariableValue.ToString());
-                        PopulateActionDescriptions(actionMapping, actionVariableValue.ToString(), route, expandedLocalPath, apiDescriptions);
-                    }
-                }
-                else if (route.Defaults.TryGetValue(ActionVariableName, out actionVariableValue))
-                {
-                    // bound action variable, { action = "actionName" }
-                    PopulateActionDescriptions(actionMappings[actionVariableValue.ToString()], actionVariableValue.ToString(), route, localPath, apiDescriptions);
-                }
-                else
-                {
-                    // no {action} specified, e.g. {controller}/{id}
-                    foreach (IGrouping<string, HttpActionDescriptor> actionMapping in actionMappings)
-                    {
-                        PopulateActionDescriptions(actionMapping, null, route, localPath, apiDescriptions);
-                    }
-                }
-            }
-        }
-        private void PopulateActionDescriptions(IEnumerable<HttpActionDescriptor> actionDescriptors, string actionVariableValue, IHttpRoute route, string localPath, Collection<ApiDescription> apiDescriptions)
-        {
-            foreach (HttpActionDescriptor actionDescriptor in actionDescriptors)
-            {
-                if (ShouldExploreAction(actionVariableValue, actionDescriptor, route))
-                {
-                    PopulateActionDescriptions(actionDescriptor, route, localPath, apiDescriptions);
-                }
-            }
-        }
 
-        private void PopulateActionDescriptions(HttpActionDescriptor actionDescriptor, IHttpRoute route, string localPath, Collection<ApiDescription> apiDescriptions)
-        {
-            string apiDocumentation = GetApiDocumentation(actionDescriptor);
-
-            // parameters
-            IList<ApiParameterDescription> parameterDescriptions = CreateParameterDescriptions(actionDescriptor);
-
-            // expand all parameter variables
-            string finalPath;
-
-            if (!TryExpandUriParameters(route, localPath, parameterDescriptions, out finalPath))
-            {
-                // the action cannot be reached due to parameter mismatch, e.g. routeTemplate = "/users/{name}" and GetUsers(id)
-                return;
-            }
-
-            // request formatters
-            ApiParameterDescription bodyParameter = parameterDescriptions.FirstOrDefault(description => description.Source == ApiParameterSource.FromBody);
-            IEnumerable<MediaTypeFormatter> supportedRequestBodyFormatters = bodyParameter != null ?
-                actionDescriptor.Configuration.Formatters.Where(f => f.CanReadType(bodyParameter.ParameterDescriptor.ParameterType)) :
-                Enumerable.Empty<MediaTypeFormatter>();
-
-            // response formatters
-            Type returnType = actionDescriptor.ReturnType;
-            IEnumerable<MediaTypeFormatter> supportedResponseFormatters = returnType != null ?
-                actionDescriptor.Configuration.Formatters.Where(f => f.CanWriteType(returnType)) :
-                Enumerable.Empty<MediaTypeFormatter>();
-
-            // get HttpMethods supported by an action. Usually there is one HttpMethod per action but we allow multiple of them per action as well.
-            IList<HttpMethod> supportedMethods = GetHttpMethodsSupportedByAction(route, actionDescriptor);
-
-            foreach (HttpMethod method in supportedMethods)
-            {
-                apiDescriptions.Add(new ApiDescription
-                {
-                    Documentation = apiDocumentation,
-                    HttpMethod = method,
-                    RelativePath = finalPath,
-                    ActionDescriptor = actionDescriptor,
-                    Route = route,
-                    //SupportedResponseFormatters = new Collection<MediaTypeFormatter>(supportedResponseFormatters.ToList()),
-                    //SupportedRequestBodyFormatters = new Collection<MediaTypeFormatter>(supportedRequestBodyFormatters.ToList()),
-                    //ParameterDescriptions = new Collection<ApiParameterDescription>(parameterDescriptions)
-                });
-            }
-        }       
-
-        private static bool TryExpandUriParameters(IHttpRoute route, string routeTemplate, ICollection<ApiParameterDescription> parameterDescriptions, out string expandedRouteTemplate)
-        {
-            SwaggerHttpParsedRoute parsedRoute = SwaggerHttpRouteParser.Parse(routeTemplate);
-            Dictionary<string, object> parameterValuesForRoute = new Dictionary<string, object>();
-            foreach (ApiParameterDescription parameterDescriptor in parameterDescriptions)
-            {
-                Type parameterType = parameterDescriptor.ParameterDescriptor.ParameterType;
-                if (parameterDescriptor.Source == ApiParameterSource.FromUri && IsSimpleUnderlyingType(parameterType))
-                {
-                    parameterValuesForRoute.Add(parameterDescriptor.Name, "{" + parameterDescriptor.Name + "}");
-                }
-            }
-
-            SwaggerBoundRouteTemplate boundRouteTemplate = parsedRoute.Bind(null, parameterValuesForRoute, new HttpRouteValueDictionary(route.Defaults), new HttpRouteValueDictionary(route.Constraints));
-            if (boundRouteTemplate == null)
-            {
-                expandedRouteTemplate = null;
-                return false;
-            }
-
-            expandedRouteTemplate = Uri.UnescapeDataString(boundRouteTemplate.BoundTemplate);
-            return true;
-        }
-        private static bool IsSimpleType(Type type)
-        {
-            return type.IsPrimitive ||
-                   type.Equals(typeof(string)) ||
-                   type.Equals(typeof(DateTime)) ||
-                   type.Equals(typeof(Decimal)) ||
-                   type.Equals(typeof(Guid)) ||
-                   type.Equals(typeof(DateTimeOffset)) ||
-                   type.Equals(typeof(TimeSpan));
-        }
-
-        private static bool IsSimpleUnderlyingType(Type type)
-        {
-            Type underlyingType = Nullable.GetUnderlyingType(type);
-            if (underlyingType != null)
-            {
-                type = underlyingType;
-            }
-
-            return IsSimpleType(type);
-        }
-
-
-        private IList<ApiParameterDescription> CreateParameterDescriptions(HttpActionDescriptor actionDescriptor)
-        {
-            IList<ApiParameterDescription> parameterDescriptions = new List<ApiParameterDescription>();
-            HttpActionBinding actionBinding = GetActionBinding(actionDescriptor);
-
-            // try get parameter binding information if available
-            if (actionBinding != null)
-            {
-                HttpParameterBinding[] parameterBindings = actionBinding.ParameterBindings;
-                if (parameterBindings != null)
-                {
-                    foreach (HttpParameterBinding parameter in parameterBindings)
-                    {
-                        parameterDescriptions.Add(CreateParameterDescriptionFromBinding(parameter));
-                    }
-                }
-            }
-            else
-            {
-                Collection<HttpParameterDescriptor> parameters = actionDescriptor.GetParameters();
-                if (parameters != null)
-                {
-                    foreach (HttpParameterDescriptor parameter in parameters)
-                    {
-                        parameterDescriptions.Add(CreateParameterDescriptionFromDescriptor(parameter));
-                    }
-                }
-            }
-
-            return parameterDescriptions;
-        }
-        private ApiParameterDescription CreateParameterDescriptionFromBinding(HttpParameterBinding parameterBinding)
-        {
-            ApiParameterDescription parameterDescription = CreateParameterDescriptionFromDescriptor(parameterBinding.Descriptor);
-            if (parameterBinding.WillReadBody)
-            {
-                parameterDescription.Source = ApiParameterSource.FromBody;
-            }
-            else if (WillReadUri(parameterBinding))
-            {
-                parameterDescription.Source = ApiParameterSource.FromUri;
-            }
-
-            return parameterDescription;
-        }
-
-        private bool WillReadUri(HttpParameterBinding parameterBinding)
-        {
-            if (parameterBinding == null)
-            {
-                throw new ArgumentNullException("parameterBinding");
-            }
-
-            IValueProviderParameterBinding valueProviderParameterBinding = parameterBinding as IValueProviderParameterBinding;
-            if (valueProviderParameterBinding != null)
-            {
-                IEnumerable<ValueProviderFactory> valueProviderFactories = valueProviderParameterBinding.ValueProviderFactories;
-                if (valueProviderFactories.Any() && valueProviderFactories.All(factory => factory is IUriValueProviderFactory))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private ApiParameterDescription CreateParameterDescriptionFromDescriptor(HttpParameterDescriptor parameter)
-        {
-            ApiParameterDescription parameterDescription = new ApiParameterDescription();
-            parameterDescription.ParameterDescriptor = parameter;
-            parameterDescription.Name = parameter.Prefix ?? parameter.ParameterName;
-            parameterDescription.Documentation = GetApiParameterDocumentation(parameter);
-            parameterDescription.Source = ApiParameterSource.Unknown;
-            return parameterDescription;
-        }
-        private string GetApiParameterDocumentation(HttpParameterDescriptor parameterDescriptor)
-        {
-            IDocumentationProvider documentationProvider = DocumentationProvider ?? parameterDescriptor.Configuration.Services.GetDocumentationProvider();
-            if (documentationProvider == null)
-            {
-                return String.Format(CultureInfo.CurrentCulture, "Documentation for '{0}'.", parameterDescriptor.Prefix ?? parameterDescriptor.ParameterName);
-            }
-
-            return documentationProvider.GetDocumentation(parameterDescriptor);
-        }
-
-        private static HttpActionBinding GetActionBinding(HttpActionDescriptor actionDescriptor)
-        {
-            HttpControllerDescriptor controllerDescriptor = actionDescriptor.ControllerDescriptor;
-            if (controllerDescriptor == null)
-            {
-                return null;
-            }
-
-            ServicesContainer controllerServices = controllerDescriptor.Configuration.Services;
-            IActionValueBinder actionValueBinder = controllerServices.GetActionValueBinder();
-            HttpActionBinding actionBinding = actionValueBinder != null ? actionValueBinder.GetBinding(actionDescriptor) : null;
-            return actionBinding;
-        }
-        private string GetApiDocumentation(HttpActionDescriptor actionDescriptor)
-        {
-            IDocumentationProvider documentationProvider = DocumentationProvider ?? actionDescriptor.Configuration.Services.GetDocumentationProvider();
-            if (documentationProvider == null)
-            {
-                return String.Format(CultureInfo.CurrentCulture, "Documentation for '{0}'.", actionDescriptor.ActionName);
-            }
-
-            return documentationProvider.GetDocumentation(actionDescriptor);
-        }
-        // remove ApiDescription that will lead to ambiguous action matching.
-        private static Collection<ApiDescription> RemoveInvalidApiDescriptions(Collection<ApiDescription> apiDescriptions)
-        {
-            HashSet<string> duplicateApiDescriptionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            HashSet<string> visitedApiDescriptionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (ApiDescription description in apiDescriptions)
-            {
-                string apiDescriptionId = description.ID;
-                if (visitedApiDescriptionIds.Contains(apiDescriptionId))
-                {
-                    duplicateApiDescriptionIds.Add(apiDescriptionId);
-                }
-                else
-                {
-                    visitedApiDescriptionIds.Add(apiDescriptionId);
-                }
-            }
-
-            Collection<ApiDescription> filteredApiDescriptions = new Collection<ApiDescription>();
-            foreach (ApiDescription apiDescription in apiDescriptions)
-            {
-                string apiDescriptionId = apiDescription.ID;
-                if (!duplicateApiDescriptionIds.Contains(apiDescriptionId))
-                {
-                    filteredApiDescriptions.Add(apiDescription);
-                }
-            }
-
-            return filteredApiDescriptions;
-        }
     }
 }

@@ -1,18 +1,12 @@
 using System.Web.Http;
-//using OrchardSwagger.Application;
 using System.Linq;
 using Autofac;
 using System;
 using System.Web.Http.Description;
-//using OrchardSwagger.Swagger;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using Orchard.Mvc.Routes;
-using Orchard.WebApi.Routes;
-using System.Web;
-using System.Web.Routing;
 using Swashbuckle.Application;
 using Swashbuckle.Swagger;
 
@@ -197,7 +191,7 @@ namespace Orchard.Swagger
                        // Wrap the default SwaggerGenerator with additional behavior (e.g. caching) or provide an
                        // alternative implementation for ISwaggerProvider with the CustomProvider option.
                        //
-                       //c.CustomProvider((defaultProvider) => new Orchard.Swagger.SwaggerConfig.CachingSwaggerProvider(defaultProvider));
+                       c.CustomProvider((defaultProvider) => new Orchard.Swagger.SwaggerConfig.CachingSwaggerProvider(defaultProvider));
                    })
                 .EnableSwaggerUi(c =>
                 {
